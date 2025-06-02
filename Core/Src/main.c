@@ -10,20 +10,20 @@ void I2C_Master_Write(uint8_t slave_addr, uint8_t *data, uint8_t length);
 int main(void) {
     uint8_t message[] = "Hello, ESP32!";
 
-    // Initialize I2C
+    
     I2C_Master_Init();
 
     while (1) {
-        // Send data to the slave
+        
         I2C_Master_Write(I2C_SLAVE_ADDRESS, message, sizeof(message) - 1);
 
-        // Delay for demonstration purposes
+        
         for (volatile int i = 0; i < 500000; i++);
     }
 }
 
 void I2C_Master_Init(void) {
-    // Enable GPIOB clock
+    /
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
 
     // Configure PB8 and PB9 as alternate function (AF4 for I2C1)
@@ -37,7 +37,7 @@ void I2C_Master_Init(void) {
     // Enable I2C1 clock
     RCC->APB1ENR |= RCC_APB1ENR_I2C1EN;
 
-    // Configure I2C1
+    
     I2C1->CR2 = 16; // APB1 clock frequency (16 MHz)
     I2C1->CCR = 80; // Clock control (100 kHz)
     I2C1->TRISE = 17; // Maximum rise time
@@ -45,26 +45,26 @@ void I2C_Master_Init(void) {
 }
 
 void I2C_Master_Write(uint8_t slave_addr, uint8_t *data, uint8_t length) {
-    // Wait until I2C is not busy
+    
     while (I2C1->SR2 & I2C_SR2_BUSY);
 
-    // Generate start condition
+    
     I2C1->CR1 |= I2C_CR1_START;
 
-    // Wait for start bit to be set
+   
     while (!(I2C1->SR1 & I2C_SR1_SB));
 
-    // Send slave address with write bit
+    
     I2C1->DR = (slave_addr << 1);
 
-    // Wait for address to be sent
+    
     while (!(I2C1->SR1 & I2C_SR1_ADDR));
-    (void)I2C1->SR2; // Clear ADDR flag by reading SR2
+    (void)I2C1->SR2; 
 
-    // Send data
+    
     for (uint8_t i = 0; i < length; i++) {
         I2C1->DR = data[i];
-        while (!(I2C1->SR1 & I2C_SR1_TXE)); // Wait for transmission
+        while (!(I2C1->SR1 & I2C_SR1_TXE)); 
     }
 
     // Generate stop condition
